@@ -3,80 +3,218 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-    <meta name="renderer" content="webkit">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-    <title>小明♡媛宝</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>我们的一家</title>
     <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
-            -webkit-font-smoothing: antialiased;
-            font-family: Helvetica Neue, Helvetica, Hiragino Sans GB, Microsoft YaHei, Arial, sans-serif;
-            background-image: url('bg.jpg');
-            font-size: 85%;
-            margin: 0;
+            font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 30%, #f48fb1 60%, #f06292 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            color: #4a2c3a;
         }
-        
-        h2 {
-            font-size: 220%;
-            font-weight: 400;
+
+        .hearts {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 0; overflow: hidden;
         }
-        
-        .content {
+        .heart {
             position: absolute;
-            width: 100%;
-            top: 40%;
-            transform: translate(0, -50%);
+            bottom: -60px;
+            font-size: 20px;
+            color: rgba(255,255,255,0.35);
+            animation: floatUp linear infinite;
+        }
+        @keyframes floatUp {
+            0%   { transform: translateY(0) rotate(0deg); opacity: 0.6; }
+            100% { transform: translateY(-110vh) rotate(360deg); opacity: 0; }
+        }
+
+        .container {
+            position: relative; z-index: 1;
+            max-width: 520px;
+            margin: 0 auto;
+            padding: 40px 20px 60px;
+        }
+
+        .header {
             text-align: center;
+            margin-bottom: 36px;
+            animation: fadeInDown 1s ease both;
         }
-        
-        .timer {
-            font-size: 180%;
-            line-height: 1.5;
-            margin: 1em 0;
+        .header h1 {
+            font-size: 32px;
+            font-weight: 300;
+            color: #fff;
+            text-shadow: 0 2px 12px rgba(180,50,80,0.25);
+            letter-spacing: 4px;
         }
-        
-        .timer b {
-            color: rgb(253, 99, 125);
+        .header .subtitle {
+            margin-top: 8px;
+            font-size: 14px;
+            color: rgba(255,255,255,0.8);
+            letter-spacing: 2px;
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            background: rgba(255,255,255,0.82);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 20px;
+            padding: 30px 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 32px rgba(180,50,80,0.12);
+            transition: transform 0.3s ease;
+            animation: fadeInUp 0.8s ease both;
+        }
+        .card:hover { transform: translateY(-3px); }
+        .card:nth-child(2) { animation-delay: 0.15s; }
+        .card:nth-child(3) { animation-delay: 0.3s; }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .card-icon {
+            font-size: 40px;
+            text-align: center;
+            margin-bottom: 12px;
+        }
+        .card-title {
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #c2185b;
+        }
+        .card-date {
+            text-align: center;
+            font-size: 13px;
+            color: #a0607a;
+            margin-bottom: 18px;
+        }
+        .timer-row {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+        }
+        .timer-unit {
+            text-align: center;
+            min-width: 56px;
+        }
+        .timer-unit .num {
+            display: block;
+            font-size: 28px;
+            font-weight: 700;
+            color: #e91e63;
+            line-height: 1.1;
+        }
+        .timer-unit .label {
+            font-size: 12px;
+            color: #a0607a;
+            margin-top: 4px;
+        }
+
+        .divider {
+            text-align: center;
+            color: rgba(255,255,255,0.6);
+            font-size: 22px;
+            margin: 8px 0 20px;
+            letter-spacing: 8px;
+        }
+
+        .footer {
+            text-align: center;
+            color: rgba(255,255,255,0.65);
+            font-size: 13px;
+            letter-spacing: 1px;
+            margin-top: 10px;
+            animation: fadeInUp 1s ease 0.5s both;
         }
     </style>
 </head>
 
 <body>
-    <div class="content">
-        <h2>媛媛，我们已经在一起了</h2>
-        <div class="timer">
-            <b id="d"></b> 天 <b id="h"></b> 小时 <b id="m"></b> 分钟 <b id="s"></b> 秒
-        </div>
+
+<div class="hearts" id="hearts"></div>
+
+<div class="container">
+    <div class="header">
+        <h1>我们的一家</h1>
+        <div class="subtitle">每一天，都是爱的续集</div>
     </div>
 
-    <script>
-        function timer() {
-            var start = new Date(2023, 7, 18);
-            var t = new Date() - start;
-			console.log(start)
-			console.log(new Date())
-            var h = ~~(t / 1000 / 60 / 60 % 24);
-            if (h < 10) {
-                h = "0" + h;
-            }
-            var m = ~~(t / 1000 / 60 % 60);
-            if (m < 10) {
-                m = "0" + m;
-            }
+    <div class="card">
+        <div class="card-icon">💒</div>
+        <div class="card-title">结婚纪念日</div>
+        <div class="card-date">2025 年 4 月 19 日</div>
+        <div class="timer-row" id="marriage-timer"></div>
+    </div>
 
-            var s = ~~(t / 1000 % 60);
-            if (s < 10) {
-                s = "0" + s;
-            }
-            document.getElementById('d').innerHTML = ~~(t / 1000 / 60 / 60 / 24);
-            document.getElementById('h').innerHTML = h;
-            document.getElementById('m').innerHTML = m;
-            document.getElementById('s').innerHTML = s;
+    <div class="divider">· · ·</div>
+
+    <div class="card">
+        <div class="card-icon">👶</div>
+        <div class="card-title">宝贝来到我们身边</div>
+        <div class="card-date">2026 年 3 月 4 日 17:08</div>
+        <div class="timer-row" id="baby-timer"></div>
+    </div>
+
+    <div class="footer">
+        愿岁月温柔，我们一直走下去
+    </div>
+</div>
+
+<script>
+    (function () {
+        var container = document.getElementById('hearts');
+        var symbols = ['\u2665', '\u2661', '\u2764', '\ud83d\udc95'];
+        for (var i = 0; i < 18; i++) {
+            var el = document.createElement('span');
+            el.className = 'heart';
+            el.textContent = symbols[i % symbols.length];
+            el.style.left = Math.random() * 100 + '%';
+            el.style.fontSize = (14 + Math.random() * 18) + 'px';
+            el.style.animationDuration = (8 + Math.random() * 12) + 's';
+            el.style.animationDelay = (Math.random() * 10) + 's';
+            container.appendChild(el);
         }
-        timer();
-        setInterval(timer, 1000);
-    </script>
-</body>
+    })();
 
+    function renderTimer(containerId, startDate) {
+        var container = document.getElementById(containerId);
+        var t = new Date() - startDate;
+        if (t < 0) t = 0;
+        var d = Math.floor(t / 86400000);
+        var h = Math.floor(t / 3600000 % 24);
+        var m = Math.floor(t / 60000 % 60);
+        var s = Math.floor(t / 1000 % 60);
+        container.innerHTML =
+            '<div class="timer-unit"><span class="num">' + d + '</span><span class="label">天</span></div>' +
+            '<div class="timer-unit"><span class="num">' + pad(h) + '</span><span class="label">时</span></div>' +
+            '<div class="timer-unit"><span class="num">' + pad(m) + '</span><span class="label">分</span></div>' +
+            '<div class="timer-unit"><span class="num">' + pad(s) + '</span><span class="label">秒</span></div>';
+    }
+    function pad(n) { return n < 10 ? '0' + n : '' + n; }
+
+    var marriage = new Date(2025, 3, 19);
+    var baby     = new Date(2026, 2, 4, 17, 8, 0);
+
+    function tick() {
+        renderTimer('marriage-timer', marriage);
+        renderTimer('baby-timer', baby);
+    }
+    tick();
+    setInterval(tick, 1000);
+</script>
+
+</body>
 </html>
