@@ -75,8 +75,10 @@
             animation: fadeInUp 0.8s ease both;
         }
         .card:hover { transform: translateY(-3px); }
-        .card:nth-child(2) { animation-delay: 0.15s; }
-        .card:nth-child(3) { animation-delay: 0.3s; }
+        .card:nth-child(2) { animation-delay: 0.1s; }
+        .card:nth-child(3) { animation-delay: 0.2s; }
+        .card:nth-child(4) { animation-delay: 0.3s; }
+        .card:nth-child(5) { animation-delay: 0.4s; }
 
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(30px); }
@@ -131,6 +133,40 @@
             letter-spacing: 8px;
         }
 
+        .section-title {
+            text-align: center;
+            font-size: 15px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 16px;
+            letter-spacing: 3px;
+        }
+
+        .reminder-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 0;
+            border-bottom: 1px solid rgba(180,50,80,0.08);
+        }
+        .reminder-item:last-child { border-bottom: none; }
+        .reminder-info .reminder-name {
+            font-size: 15px;
+            font-weight: 500;
+            color: #4a2c3a;
+        }
+        .reminder-info .reminder-date {
+            font-size: 12px;
+            color: #a0607a;
+            margin-top: 3px;
+        }
+        .reminder-days {
+            font-size: 14px;
+            font-weight: 600;
+            color: #e91e63;
+            white-space: nowrap;
+        }
+
         .footer {
             text-align: center;
             color: rgba(255,255,255,0.65);
@@ -153,19 +189,32 @@
     </div>
 
     <div class="card">
+        <div class="card-icon">❤</div>
+        <div class="card-title">恋爱纪念日</div>
+        <div class="card-date">2023 年 8 月 18 日</div>
+        <div class="timer-row" id="love-timer"></div>
+    </div>
+
+    <div class="card">
         <div class="card-icon">💒</div>
         <div class="card-title">结婚纪念日</div>
         <div class="card-date">2025 年 4 月 19 日</div>
         <div class="timer-row" id="marriage-timer"></div>
     </div>
 
-    <div class="divider">· · ·</div>
-
     <div class="card">
         <div class="card-icon">👶</div>
         <div class="card-title">宝贝来到我们身边</div>
         <div class="card-date">2026 年 3 月 4 日 17:08</div>
         <div class="timer-row" id="baby-timer"></div>
+    </div>
+
+    <div class="divider">· · ·</div>
+
+    <div class="section-title">下一次纪念日提醒</div>
+
+    <div class="card">
+        <div id="reminder-list"></div>
     </div>
 
     <div class="footer">
@@ -203,14 +252,57 @@
             '<div class="timer-unit"><span class="num">' + pad(m) + '</span><span class="label">分</span></div>' +
             '<div class="timer-unit"><span class="num">' + pad(s) + '</span><span class="label">秒</span></div>';
     }
+
     function pad(n) { return n < 10 ? '0' + n : '' + n; }
 
-    var marriage = new Date(2025, 3, 19);
-    var baby     = new Date(2026, 2, 4, 17, 8, 0);
+    // 核心日期
+    var loveDate  = new Date(2023, 7, 18);           // 2023-08-18
+    var marriage  = new Date(2025, 3, 19);            // 2025-04-19
+    var baby      = new Date(2026, 2, 4, 17, 8, 0);   // 2026-03-04 17:08
+
+    // 计算下一个周年纪念日
+    function nextAnniversary(startDate, label, monthLabel) {
+        var now = new Date();
+        var year = now.getFullYear();
+        var next = new Date(year, startDate.getMonth(), startDate.getDate());
+        if (next <= now) {
+            next = new Date(year + 1, startDate.getMonth(), startDate.getDate());
+        }
+        var days = Math.ceil((next - now) / 86400000);
+        var annYear = next.getFullYear() - startDate.getFullYear();
+        return {
+            name: label + ' ' + annYear + '周年',
+            date: (next.getMonth() + 1) + '月' + next.getDate() + '日',
+            days: days
+        };
+    }
+
+    function renderReminders() {
+        var reminders = [
+            nextAnniversary(loveDate, '恋爱', '恋爱'),
+            nextAnniversary(marriage, '结婚', '结婚'),
+            nextAnniversary(baby, '宝贝生日', '宝贝')
+        ];
+        reminders.sort(function (a, b) { return a.days - b.days; });
+        var html = '';
+        for (var i = 0; i < reminders.length; i++) {
+            var r = reminders[i];
+            html += '<div class="reminder-item">' +
+                '<div class="reminder-info">' +
+                    '<div class="reminder-name">' + r.name + '</div>' +
+                    '<div class="reminder-date">' + r.date + '</div>' +
+                '</div>' +
+                '<div class="reminder-days">还有 ' + r.days + ' 天</div>' +
+            '</div>';
+        }
+        document.getElementById('reminder-list').innerHTML = html;
+    }
 
     function tick() {
+        renderTimer('love-timer', loveDate);
         renderTimer('marriage-timer', marriage);
         renderTimer('baby-timer', baby);
+        renderReminders();
     }
     tick();
     setInterval(tick, 1000);
