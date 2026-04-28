@@ -238,19 +238,45 @@
         }
     })();
 
-    function renderTimer(containerId, startDate) {
+    function renderTimer(containerId, startDate, opts) {
         var container = document.getElementById(containerId);
-        var t = new Date() - startDate;
+        var now = new Date();
+        var t = now - startDate;
         if (t < 0) t = 0;
-        var d = Math.floor(t / 86400000);
-        var h = Math.floor(t / 3600000 % 24);
-        var m = Math.floor(t / 60000 % 60);
-        var s = Math.floor(t / 1000 % 60);
-        container.innerHTML =
-            '<div class="timer-unit"><span class="num">' + d + '</span><span class="label">天</span></div>' +
-            '<div class="timer-unit"><span class="num">' + pad(h) + '</span><span class="label">时</span></div>' +
-            '<div class="timer-unit"><span class="num">' + pad(m) + '</span><span class="label">分</span></div>' +
-            '<div class="timer-unit"><span class="num">' + pad(s) + '</span><span class="label">秒</span></div>';
+        var totalDays = Math.floor(t / 86400000);
+
+        if (opts && opts.type === 'age') {
+            // 岁 + 天
+            var age = now.getFullYear() - startDate.getFullYear();
+            var birthdayThisYear = new Date(now.getFullYear(), startDate.getMonth(), startDate.getDate());
+            if (birthdayThisYear > now) age--;
+            var daysIntoYear = Math.floor((now - new Date(now.getFullYear(), 0, 1)) / 86400000);
+            container.innerHTML =
+                '<div class="timer-unit"><span class="num">' + age + '</span><span class="label">岁</span></div>' +
+                '<div class="timer-unit"><span class="num">' + totalDays + '</span><span class="label">天</span></div>';
+        } else if (opts && opts.type === 'years') {
+            // 年 + 天
+            var years = now.getFullYear() - startDate.getFullYear();
+            var annThisYear = new Date(now.getFullYear(), startDate.getMonth(), startDate.getDate());
+            if (annThisYear > now) years--;
+            var lastAnniversary = new Date(now.getFullYear() - years, startDate.getMonth(), startDate.getDate());
+            if (lastAnniversary > now) lastAnniversary = new Date(now.getFullYear() - years - 1, startDate.getMonth(), startDate.getDate());
+            var daysSinceAnn = Math.floor((now - lastAnniversary) / 86400000);
+            container.innerHTML =
+                '<div class="timer-unit"><span class="num">' + years + '</span><span class="label">年</span></div>' +
+                '<div class="timer-unit"><span class="num">' + daysSinceAnn + '</span><span class="label">天</span></div>';
+        } else {
+            // 默认：天 时 分 秒
+            var d = Math.floor(t / 86400000);
+            var h = Math.floor(t / 3600000 % 24);
+            var m = Math.floor(t / 60000 % 60);
+            var s = Math.floor(t / 1000 % 60);
+            container.innerHTML =
+                '<div class="timer-unit"><span class="num">' + d + '</span><span class="label">天</span></div>' +
+                '<div class="timer-unit"><span class="num">' + pad(h) + '</span><span class="label">时</span></div>' +
+                '<div class="timer-unit"><span class="num">' + pad(m) + '</span><span class="label">分</span></div>' +
+                '<div class="timer-unit"><span class="num">' + pad(s) + '</span><span class="label">秒</span></div>';
+        }
     }
 
     function pad(n) { return n < 10 ? '0' + n : '' + n; }
@@ -322,9 +348,9 @@
     }
 
     function tick() {
-        renderTimer('love-timer', loveDate);
-        renderTimer('marriage-timer', marriage);
-        renderTimer('baby-timer', baby);
+        renderTimer('baby-timer', baby, { type: 'age' });
+        renderTimer('marriage-timer', marriage, { type: 'years' });
+        renderTimer('love-timer', loveDate, { type: 'years' });
         renderReminders();
     }
     tick();
