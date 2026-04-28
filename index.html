@@ -75,12 +75,10 @@
             animation: fadeInUp 0.8s ease both;
         }
         .card:hover { transform: translateY(-3px); }
-        .card:nth-child(2) { animation-delay: 0.08s; }
-        .card:nth-child(3) { animation-delay: 0.16s; }
-        .card:nth-child(4) { animation-delay: 0.24s; }
-        .card:nth-child(5) { animation-delay: 0.32s; }
-        .card:nth-child(6) { animation-delay: 0.4s; }
-        .card:nth-child(7) { animation-delay: 0.48s; }
+        .card:nth-child(2) { animation-delay: 0.1s; }
+        .card:nth-child(3) { animation-delay: 0.2s; }
+        .card:nth-child(4) { animation-delay: 0.3s; }
+        .card:nth-child(5) { animation-delay: 0.4s; }
 
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(30px); }
@@ -190,11 +188,18 @@
         <div class="subtitle">每一天，都是爱的续集</div>
     </div>
 
+    <div class="section-title">下一次纪念日提醒</div>
+    <div class="card" style="animation-delay: 0s;">
+        <div id="reminder-list"></div>
+    </div>
+
+    <div class="divider">· · ·</div>
+
     <div class="card">
-        <div class="card-icon">❤</div>
-        <div class="card-title">恋爱纪念日</div>
-        <div class="card-date">2023 年 8 月 18 日</div>
-        <div class="timer-row" id="love-timer"></div>
+        <div class="card-icon">👶</div>
+        <div class="card-title">宝贝来到我们身边</div>
+        <div class="card-date">2026 年 3 月 4 日 17:08</div>
+        <div class="timer-row" id="baby-timer"></div>
     </div>
 
     <div class="card">
@@ -205,32 +210,10 @@
     </div>
 
     <div class="card">
-        <div class="card-icon">👶</div>
-        <div class="card-title">宝贝来到我们身边</div>
-        <div class="card-date">2026 年 3 月 4 日 17:08</div>
-        <div class="timer-row" id="baby-timer"></div>
-    </div>
-
-    <div class="card">
-        <div class="card-icon">🎂</div>
-        <div class="card-title">爸爸的生日</div>
-        <div class="card-date">农历 1995年3月21日</div>
-        <div class="timer-row" id="dad-birthday-timer"></div>
-    </div>
-
-    <div class="card">
-        <div class="card-icon">🎂</div>
-        <div class="card-title">妈妈的生日</div>
-        <div class="card-date">农历 1994年5月19日</div>
-        <div class="timer-row" id="mom-birthday-timer"></div>
-    </div>
-
-    <div class="divider">· · ·</div>
-
-    <div class="section-title">下一次纪念日提醒</div>
-
-    <div class="card">
-        <div id="reminder-list"></div>
+        <div class="card-icon">❤</div>
+        <div class="card-title">恋爱纪念日</div>
+        <div class="card-date">2023 年 8 月 18 日</div>
+        <div class="timer-row" id="love-timer"></div>
     </div>
 
     <div class="footer">
@@ -401,24 +384,6 @@
         renderTimer('love-timer', loveDate);
         renderTimer('marriage-timer', marriage);
         renderTimer('baby-timer', baby);
-
-        // 父母生日倒计时 — 显示距下次农历生日
-        var dadNext = nextSolarBirthday(dadLunar);
-        if (dadNext) {
-            document.getElementById('dad-birthday-timer').innerHTML =
-                '<div class="timer-unit"><span class="num">' + dadNext.days + '</span><span class="label">天</span></div>' +
-                '<div class="timer-unit"><span class="num">' + dadNext.age + '</span><span class="label">岁</span></div>' +
-                '<div class="timer-unit"><span class="num">' + (dadNext.solar.getMonth() + 1) + '/' + dadNext.solar.getDate() + '</span><span class="label">公历</span></div>';
-        }
-
-        var momNext = nextSolarBirthday(momLunar);
-        if (momNext) {
-            document.getElementById('mom-birthday-timer').innerHTML =
-                '<div class="timer-unit"><span class="num">' + momNext.days + '</span><span class="label">天</span></div>' +
-                '<div class="timer-unit"><span class="num">' + momNext.age + '</span><span class="label">岁</span></div>' +
-                '<div class="timer-unit"><span class="num">' + (momNext.solar.getMonth() + 1) + '/' + momNext.solar.getDate() + '</span><span class="label">公历</span></div>';
-        }
-
         renderReminders();
     }
     tick();
