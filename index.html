@@ -75,10 +75,12 @@
             animation: fadeInUp 0.8s ease both;
         }
         .card:hover { transform: translateY(-3px); }
-        .card:nth-child(2) { animation-delay: 0.1s; }
-        .card:nth-child(3) { animation-delay: 0.2s; }
-        .card:nth-child(4) { animation-delay: 0.3s; }
-        .card:nth-child(5) { animation-delay: 0.4s; }
+        .card:nth-child(2) { animation-delay: 0.08s; }
+        .card:nth-child(3) { animation-delay: 0.16s; }
+        .card:nth-child(4) { animation-delay: 0.24s; }
+        .card:nth-child(5) { animation-delay: 0.32s; }
+        .card:nth-child(6) { animation-delay: 0.4s; }
+        .card:nth-child(7) { animation-delay: 0.48s; }
 
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(30px); }
@@ -209,6 +211,20 @@
         <div class="timer-row" id="baby-timer"></div>
     </div>
 
+    <div class="card">
+        <div class="card-icon">🎂</div>
+        <div class="card-title">爸爸的生日</div>
+        <div class="card-date">农历 1995年3月21日</div>
+        <div class="timer-row" id="dad-birthday-timer"></div>
+    </div>
+
+    <div class="card">
+        <div class="card-icon">🎂</div>
+        <div class="card-title">妈妈的生日</div>
+        <div class="card-date">农历 1994年5月19日</div>
+        <div class="timer-row" id="mom-birthday-timer"></div>
+    </div>
+
     <div class="divider">· · ·</div>
 
     <div class="section-title">下一次纪念日提醒</div>
@@ -255,34 +271,117 @@
 
     function pad(n) { return n < 10 ? '0' + n : '' + n; }
 
-    // 核心日期
-    var loveDate  = new Date(2023, 7, 18);           // 2023-08-18
-    var marriage  = new Date(2025, 3, 19);            // 2025-04-19
-    var baby      = new Date(2026, 2, 4, 17, 8, 0);   // 2026-03-04 17:08
+    // 农历转公历 (1900-2100)
+    var lunarInfo = [
+        0x04bd8,0x04ae0,0x0a570,0x054d5,0x0d260,0x0d950,0x16554,0x056a0,0x09ad0,0x055d2,
+        0x04ae0,0x0a5b6,0x0a4d0,0x0d250,0x1d255,0x0b540,0x0d6a0,0x0ada2,0x095b0,0x14977,
+        0x04970,0x0a4b0,0x0b4b5,0x06a50,0x06d40,0x1ab54,0x02b60,0x09570,0x052f2,0x04970,
+        0x06566,0x0d4a0,0x0ea50,0x06e95,0x05ad0,0x02b60,0x186e3,0x092e0,0x1c8d7,0x0c950,
+        0x0d4a0,0x1d8a6,0x0b550,0x056a0,0x1a5b4,0x025d0,0x092d0,0x0d2b2,0x0a950,0x0b557,
+        0x06ca0,0x0b550,0x15355,0x04da0,0x0a5b0,0x14573,0x052b0,0x0a9a8,0x0e950,0x06aa0,
+        0x0aea6,0x0ab50,0x04b60,0x0aae4,0x0a570,0x05260,0x0f263,0x0d950,0x05b57,0x056a0,
+        0x096d0,0x04dd5,0x04ad0,0x0a4d0,0x0d4d4,0x0d250,0x0d558,0x0b540,0x0b6a0,0x195a6,
+        0x095b0,0x049b0,0x0a974,0x0a4b0,0x0b27a,0x06a50,0x06d40,0x0af46,0x0ab60,0x09570,
+        0x04af5,0x04970,0x064b0,0x074a3,0x0ea50,0x06b58,0x05ac0,0x0ab60,0x096d5,0x092e0,
+        0x0c960,0x0d954,0x0d4a0,0x0da50,0x07552,0x056a0,0x0abb7,0x025d0,0x092d0,0x0cab5,
+        0x0a950,0x0b4a0,0x0baa4,0x0ad50,0x055d9,0x04ba0,0x0a5b0,0x15176,0x052b0,0x0a930,
+        0x07954,0x06aa0,0x0ad50,0x05b52,0x04b60,0x0a6e6,0x0a4e0,0x0d260,0x0ea65,0x0d530,
+        0x05aa0,0x076a3,0x096d0,0x04afb,0x04ad0,0x0a4d0,0x1d0b6,0x0d250,0x0d520,0x0dd45,
+        0x0b5a0,0x056d0,0x055b2,0x049b0,0x0a577,0x0a4b0,0x0aa50,0x1b255,0x06d20,0x0ada0,
+        0x14b63,0x09370,0x049f8,0x04970,0x064b0,0x168a6,0x0ea50,0x06b20,0x1a6c4,0x0aae0,
+        0x092e0,0x0d2e3,0x0c960,0x0d557,0x0d4a0,0x0da50,0x05d55,0x056a0,0x0a6d0,0x055d4,
+        0x052d0,0x0a9b8,0x0a950,0x0b4a0,0x0b6a6,0x0ad50,0x055a0,0x0aba4,0x0a5b0,0x052b0,
+        0x0b273,0x06930,0x07337,0x06aa0,0x0ad50,0x14b55,0x04b60,0x0a570,0x054e4,0x0d160,
+        0x0e968,0x0d520,0x0daa0,0x16aa6,0x056d0,0x04ae0,0x0a9d4,0x0a4d0,0x0d150,0x0f252,
+        0x0d520
+    ];
 
-    // 计算下一个周年纪念日
-    function nextAnniversary(startDate, label, monthLabel) {
-        var now = new Date();
-        var year = now.getFullYear();
-        var next = new Date(year, startDate.getMonth(), startDate.getDate());
-        if (next <= now) {
-            next = new Date(year + 1, startDate.getMonth(), startDate.getDate());
+    function lYearDays(y) {
+        var sum = 348, i;
+        for (i = 0x8000; i > 0x8; i >>= 1) sum += (lunarInfo[y - 1900] & i) ? 1 : 0;
+        return sum + leapDays(y);
+    }
+    function leapMonth(y) { return lunarInfo[y - 1900] & 0xf; }
+    function leapDays(y) {
+        if (leapMonth(y)) return (lunarInfo[y - 1900] & 0x10000) ? 30 : 29;
+        return 0;
+    }
+    function monthDays(y, m) { return (lunarInfo[y - 1900] & (0x10000 >> m)) ? 30 : 29; }
+
+    function lunarToSolar(lYear, lMonth, lDay) {
+        var base = new Date(1900, 0, 31);
+        var offset = 0, i;
+        for (i = 1900; i < lYear; i++) offset += lYearDays(i);
+        var lm = leapMonth(lYear);
+        for (i = 1; i < lMonth; i++) {
+            offset += monthDays(lYear, i);
+            if (i === lm) offset += leapDays(lYear);
         }
-        var days = Math.ceil((next - now) / 86400000);
-        var annYear = next.getFullYear() - startDate.getFullYear();
-        return {
-            name: label + ' ' + annYear + '周年',
-            date: (next.getMonth() + 1) + '月' + next.getDate() + '日',
-            days: days
-        };
+        offset += lDay - 1;
+        return new Date(base.getTime() + offset * 86400000);
+    }
+
+    function findNextLunarBirthday(lMonth, lDay) {
+        var now = new Date();
+        // search from current year to current year + 2
+        for (var y = now.getFullYear(); y <= now.getFullYear() + 2; y++) {
+            var solar = lunarToSolar(y, lMonth, lDay);
+            if (solar > now) {
+                var age = y - baseLunarYear;
+                return { solar: solar, days: Math.ceil((solar - now) / 86400000), age: age };
+            }
+        }
+        return null;
+    }
+
+    var baseLunarYear = 1995; // default for dad
+
+    // 核心日期
+    var loveDate    = new Date(2023, 7, 18);           // 2023-08-18
+    var marriage    = new Date(2025, 3, 19);            // 2025-04-19
+    var baby        = new Date(2026, 2, 4, 17, 8, 0);   // 2026-03-04 17:08
+
+    // 父母农历生日
+    var dadLunar  = { year: 1995, month: 3,  day: 21, label: '爸爸' };
+    var momLunar  = { year: 1994, month: 5,  day: 19, label: '妈妈' };
+
+    function nextSolarBirthday(lunar) {
+        var now = new Date();
+        for (var y = now.getFullYear(); y <= now.getFullYear() + 2; y++) {
+            var solar = lunarToSolar(y, lunar.month, lunar.day);
+            if (solar > now) {
+                var age = y - lunar.year;
+                return {
+                    solar: solar,
+                    days: Math.ceil((solar - now) / 86400000),
+                    age: age,
+                    date: (solar.getMonth() + 1) + '月' + solar.getDate() + '日'
+                };
+            }
+        }
+        return null;
+    }
+
+    function daysUntilDate(month, day) {
+        var now = new Date();
+        var target = new Date(now.getFullYear(), month - 1, day);
+        if (target <= now) target = new Date(now.getFullYear() + 1, month - 1, day);
+        return Math.ceil((target - now) / 86400000);
     }
 
     function renderReminders() {
         var reminders = [
-            nextAnniversary(loveDate, '恋爱', '恋爱'),
-            nextAnniversary(marriage, '结婚', '结婚'),
-            nextAnniversary(baby, '宝贝生日', '宝贝')
+            { name: '恋爱纪念日', date: '8月18日', days: daysUntilDate(8, 18) },
+            { name: '结婚纪念日', date: '4月19日', days: daysUntilDate(4, 19) },
+            { name: '宝贝生日', date: '3月4日', days: daysUntilDate(3, 4) },
         ];
+
+        var dadNext = nextSolarBirthday(dadLunar);
+        if (dadNext) reminders.push({ name: '爸爸生日', date: '农历' + dadLunar.month + '月' + dadLunar.day + '日（公历' + dadNext.date + '）', days: dadNext.days });
+
+        var momNext = nextSolarBirthday(momLunar);
+        if (momNext) reminders.push({ name: '妈妈生日', date: '农历' + momLunar.month + '月' + momLunar.day + '日（公历' + momNext.date + '）', days: momNext.days });
+
         reminders.sort(function (a, b) { return a.days - b.days; });
         var html = '';
         for (var i = 0; i < reminders.length; i++) {
@@ -302,6 +401,24 @@
         renderTimer('love-timer', loveDate);
         renderTimer('marriage-timer', marriage);
         renderTimer('baby-timer', baby);
+
+        // 父母生日倒计时 — 显示距下次农历生日
+        var dadNext = nextSolarBirthday(dadLunar);
+        if (dadNext) {
+            document.getElementById('dad-birthday-timer').innerHTML =
+                '<div class="timer-unit"><span class="num">' + dadNext.days + '</span><span class="label">天</span></div>' +
+                '<div class="timer-unit"><span class="num">' + dadNext.age + '</span><span class="label">岁</span></div>' +
+                '<div class="timer-unit"><span class="num">' + (dadNext.solar.getMonth() + 1) + '/' + dadNext.solar.getDate() + '</span><span class="label">公历</span></div>';
+        }
+
+        var momNext = nextSolarBirthday(momLunar);
+        if (momNext) {
+            document.getElementById('mom-birthday-timer').innerHTML =
+                '<div class="timer-unit"><span class="num">' + momNext.days + '</span><span class="label">天</span></div>' +
+                '<div class="timer-unit"><span class="num">' + momNext.age + '</span><span class="label">岁</span></div>' +
+                '<div class="timer-unit"><span class="num">' + (momNext.solar.getMonth() + 1) + '/' + momNext.solar.getDate() + '</span><span class="label">公历</span></div>';
+        }
+
         renderReminders();
     }
     tick();
